@@ -11,6 +11,7 @@ class Todo extends Model
 
     protected $fillable = [
         "title", "description", "status_id",
+        "user_created"
     ];
 
     protected $hidden = [
@@ -24,6 +25,6 @@ class Todo extends Model
 
     public function user()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsTo(User::class);
     }
 }

@@ -17,7 +17,8 @@ return new class extends Migration
             $table->id();
             $table->string("title");
             $table->text("description");
-            $table->foreignId("status_id")->default(1)->constrained();
+            $table->foreignId("status_id")->default(1)->constrained("statuses");
+            $table->string("user_created");
             $table->timestamps();
         });
     }

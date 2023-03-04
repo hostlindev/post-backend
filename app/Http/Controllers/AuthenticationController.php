@@ -29,17 +29,18 @@ class AuthenticationController extends Controller
 
         return response()->json([
             "message" => "Acceso correcto.",
-            "data" => $user,
+            "data" => LoginResource::make($user),
         ], 200);
     }
 
     public function register(RegisterRequest $request)
     {
-        $request->validated($request->all());
+        $request->validated();
 
         $user = User::create([
             "name" => $request->name,
             "lastname" => $request->lastname,
+            "username" => $request->username,
             "email" => $request->email,
             "password" => Hash::make($request->password),
             "permission_id" => User::PERMISSION["create"],

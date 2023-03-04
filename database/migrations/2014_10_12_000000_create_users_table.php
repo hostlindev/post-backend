@@ -17,9 +17,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('lastname');
+            $table->string("username", 50)->unique();
             $table->string('email')->unique();
             $table->string('password');
-            $table->foreignId('permission_id')->default(2)->constrained();
+            $table->foreignId('permission_id')->default(2)->constrained("permissions");
             $table->rememberToken();
             $table->timestamps();
         });

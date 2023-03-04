@@ -26,6 +26,7 @@ class RegisterRequest extends FormRequest
         return [
             "name" => "required|string",
             "lastname" => "required|string",
+            "username" => "required|unique:users",
             "email" => "required|unique:users,email|email",
             "password" => "required|min:6|confirmed",
         ];
@@ -37,8 +38,11 @@ class RegisterRequest extends FormRequest
             "name.required" => "El nombre es requerido.",
             "name.string" => "El nombre no es valido.",
 
-            "apellido.required" => "El apellido es requerido.",
-            "apellido.string" => "El apellido no es valido.",
+            "lastname.required" => "El apellido es requerido.",
+            "lastname.string" => "El apellido no es valido.",
+
+            "username.required" => "El nombre de usuario es requerido.",
+            "username.unique" => "El nombre de usuario que intenta utilizar ya fue registrado.",
 
             "email.required" => "El correo es requerido.",
             "email.unique" => "El correo que intenta utilizar ya fue registrado.",

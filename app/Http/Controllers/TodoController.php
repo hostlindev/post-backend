@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTodoRequest;
+use App\Http\Resources\TodoStoreResource;
 use App\Models\Todo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Stmt\TryCatch;
 
 class TodoController extends Controller
@@ -16,9 +18,11 @@ class TodoController extends Controller
      */
     public function index()
     {
+        $todo = Todo::where("user_created", Auth::user()->username)->get();
+
         return [
             "message" => "Se ha consultado la lista de tareas.",
-            "data" => Todo::all(),
+            "data" => $todo,
         ];
     }
 
@@ -42,16 +46,25 @@ class TodoController extends Controller
     {
         $request->validated();
 
-        $data = Todo::create([
-            "title" => $request->title,
-            "description" => $request->description,
-            "status" => $request?->status,
-        ]);
+        $user = Auth::user();
+
+        if ($user->permission_id != 1) {
+            $data = Todo::create([
+                "title" => $request->title,
+                "description" => $request->description,
+                "status" => $request?->status,
+                "user_created" => $user->username,
+            ]);
+
+            return response()->json([
+                "message" => "Se ha creado con exito la tarea.",
+                "data" => TodoStoreResource::make($data),
+            ], 200);
+        }
 
         return response()->json([
-            "message" => "Se ha creado con exito la tarea.",
-            "data" => $data,
-        ], 200);
+            "message" => "No tiene permisos para crear una tarea.",
+        ]);
     }
 
     /**
@@ -93,13 +106,20 @@ class TodoController extends Controller
 
         $data = $request->validated();
 
-        $todo = Todo::findOrFail($id);
+        $user = Auth::user();
 
-        $todo->update($data);
+        if ($user->permission_id != 1) {
 
+            $todo = Todo::findOrFail($id);
+            $todo->update($data);
+
+            return response()->json([
+                "message" => "Se ha actualizado la tarea.",
+                "data" => $todo,
+            ]);
+        }
         return response()->json([
-            "message" => "Se ha actualizado la tarea.",
-            "data" => $todo,
+            "message" => "No tiene permiso para actualizar la tarea.",
         ]);
     }
 
@@ -111,9 +131,16 @@ class TodoController extends Controller
      */
     public function destroy($id)
     {
-        Todo::destroy($id);
+        $user = Auth::user();
+
+        if ($user->permission_id == 3) {
+            Todo::destroy($id);
+            return [
+                "message" => "Se borro con exito la tarea.",
+            ];
+        }
         return [
-            "message" => "Se borro con exito la tarea.",
+            "message" => "No tiene permiso para borrar la tarea.",
         ];
     }
 }
